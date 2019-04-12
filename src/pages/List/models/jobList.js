@@ -1,5 +1,7 @@
+import { pageJobList } from '@/services/api';
+
 export default {
-  namespace: 'rule',
+  namespace: 'jobList',
 
   state: {
     data: {
@@ -9,13 +11,14 @@ export default {
   },
 
   effects: {
-    // *fetch({ payload }, { call, put }) {
-    //   const response = yield call(queryRule, payload);
-    //   yield put({
-    //     type: 'save',
-    //     payload: response,
-    //   });
-    // },
+    *pageJobList({ payload }, { call, put }) {
+      console.log(payload);
+      const response = yield call(pageJobList, payload);
+      yield put({
+        type: 'save',
+        payload: response,
+      });
+    },
     // *add({ payload, callback }, { call, put }) {
     //   const response = yield call(addRule, payload);
     //   yield put({
@@ -43,11 +46,12 @@ export default {
   },
 
   reducers: {
-    // save(state, action) {
-    //   return {
-    //     ...state,
-    //     data: action.payload,
-    //   };
-    // },
+    save(state, action) {
+      const res = action.payload.result;
+      return {
+        ...state,
+        data: res,
+      };
+    },
   },
 };

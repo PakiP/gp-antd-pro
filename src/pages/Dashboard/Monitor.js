@@ -29,9 +29,9 @@ const havePermissionAsync = new Promise(resolve => {
 class Monitor extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'monitor/fetchTags',
-    });
+    // dispatch({
+    //   type: 'monitor/fetchTags',
+    // });
   }
 
   render() {
@@ -40,7 +40,7 @@ class Monitor extends Component {
 
     return (
       <GridContent>
-        <Row gutter={24}>
+        {/* <Row gutter={24}>
           <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
               title={
@@ -235,7 +235,7 @@ class Monitor extends Component {
               />
             </Card>
           </Col>
-        </Row>
+        </Row>*/}
       </GridContent>
     );
   }

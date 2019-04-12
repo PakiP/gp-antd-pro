@@ -47,12 +47,12 @@ class BasicList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'list/fetch',
-      payload: {
-        count: 5,
-      },
-    });
+    // dispatch({
+    //   type: 'list/fetch',
+    //   payload: {
+    //     count: 5,
+    //   },
+    // });
   }
 
   showModal = () => {

@@ -5,7 +5,7 @@ import { connect } from 'dva';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import Media from 'react-media';
-import logo from '../assets/logo.svg';
+import logo from '../assets/icon_homeser.svg';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
@@ -108,6 +108,7 @@ class BasicLayout extends React.Component {
       fixedHeader,
     } = this.props;
 
+
     const isTop = PropsLayout === 'topmenu';
     const contentStyle = !fixedHeader ? { paddingTop: 0 } : {};
     const layout = (
@@ -118,7 +119,6 @@ class BasicLayout extends React.Component {
             theme={navTheme}
             onCollapse={this.handleMenuCollapse}
             menuData={menuData}
-            isMobile={isMobile}
             {...this.props}
           />
         )}
@@ -128,13 +128,14 @@ class BasicLayout extends React.Component {
             minHeight: '100vh',
           }}
         >
-          <Header
+          {/* <Header
             menuData={menuData}
             handleMenuCollapse={this.handleMenuCollapse}
             logo={logo}
             isMobile={isMobile}
+            // currentUser={currentUser}
             {...this.props}
-          />
+          /> */}
           <Content className={styles.content} style={contentStyle}>
             {children}
           </Content>

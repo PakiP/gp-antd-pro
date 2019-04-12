@@ -1,6 +1,48 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
+
+export async function startCrawler(params) {
+  return request('/api/crawler/crawlJobData', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'get',
+    },
+  });
+}
+
+export async function stopCrawler(params) {
+  return request('/api/crawler/stop', {
+    method: 'GET',
+    data: {
+      ...params,
+      method: 'get',
+    },
+  });
+}
+
+export async function pageLog(params) {
+  return request('/api/manage/pageLog', {
+    method: 'GET',
+    data: {
+      ...params,
+      method: 'get',
+    },
+  });
+}
+
+export async function pageJobList(params) {
+  console.log(params);
+  return request('/api/manage/pageJobList', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }

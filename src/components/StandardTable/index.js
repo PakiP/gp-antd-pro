@@ -8,6 +8,7 @@ function initTotalList(columns) {
     if (column.needTotal) {
       totalList.push({ ...column, total: 0 });
     }
+    console.log('totalList', totalList)
   });
   return totalList;
 }
@@ -17,6 +18,7 @@ class StandardTable extends PureComponent {
     super(props);
     const { columns } = props;
     const needTotalList = initTotalList(columns);
+    console.log('needTotalList', needTotalList);
 
     this.state = {
       selectedRowKeys: [],
