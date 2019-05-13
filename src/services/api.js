@@ -207,3 +207,12 @@ export async function getCategoryGroup() {
   return request(`/api/manage/getCategoryGroup`);
 }
 
+export async function getCrawlerStatus() {
+  return request(`/api/manage/getCrawlerStatus`);
+}
+
+export async function getMenuList() {
+  return request(`/api/crawler/getMenuList`);
+}
+
+

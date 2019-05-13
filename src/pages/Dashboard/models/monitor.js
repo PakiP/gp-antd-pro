@@ -1,4 +1,4 @@
-import { getTagCloud, getJobAndUserNum, getCategoryGroup } from '@/services/api';
+import { getTagCloud, getJobAndUserNum, getCategoryGroup, getCrawlerStatus } from '@/services/api';
 
 export default {
   namespace: 'monitor',
@@ -29,6 +29,13 @@ export default {
         payload: response.result,
       });
     },
+    *getCrawlerStatus(_, { call, put }) {
+      const response = yield call(getCrawlerStatus);
+      yield put({
+        type: 'saveCrawlerStatus',
+        payload: response.result,
+      });
+    },
   },
 
   reducers: {
@@ -48,6 +55,12 @@ export default {
       return {
         ...state,
         categoryGroup: action.payload,
+      };
+    },
+    saveCrawlerStatus(state, action) {
+      return {
+        ...state,
+        crawlerStatus: action.payload,
       };
     },
   },

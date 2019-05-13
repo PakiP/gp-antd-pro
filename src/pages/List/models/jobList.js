@@ -68,7 +68,7 @@ export default {
     },
     saveJobStatus(state, action) {
       const res = action.payload.result;
-      console.log(res);
+      // console.log(res);
       return {
         ...state,
       };

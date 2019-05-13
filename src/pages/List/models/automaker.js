@@ -1,4 +1,4 @@
-import { pageLog, startCrawler, stopCrawler } from '@/services/api';
+import { pageLog, startCrawler, stopCrawler, getMenuList } from '@/services/api';
 
 export default {
   namespace: 'automaker',
@@ -31,7 +31,14 @@ export default {
     },
     *stopCrawler({ payload }, { call, put }) {
       const response = yield call(stopCrawler, payload);
-    }
+    },
+    *getMenuList({ payload }, { call, put }) {
+      const response = yield call(getMenuList, payload);
+      yield put({
+        type: 'saveMenuList',
+        payload: response,
+      });
+    },
   },
 
   reducers: {
@@ -54,6 +61,13 @@ export default {
       return {
         ...state,
         isRun: false,
+      };
+    },
+    saveMenuList(state, action) {
+      const res = action.payload.result;
+      return {
+        ...state,
+        menuList: res,
       };
     }
   },

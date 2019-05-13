@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
-import { Row, Col, Card, Tooltip, Icon } from 'antd';
+import { Row, Col, Card, Tooltip, Icon, Statistic } from 'antd';
 import { Pie, WaterWave, Gauge, TagCloud, ChartCard, yuan, MiniBar, Field } from '@/components/Charts';
 import NumberInfo from '@/components/NumberInfo';
 import CountDown from '@/components/CountDown';
@@ -39,18 +39,22 @@ class Monitor extends Component {
     dispatch({
       type: 'monitor/getCategoryGroup',
     });
+    dispatch({
+      type: 'monitor/getCrawlerStatus',
+    });
   }
 
   render() {
     const { monitor, loading } = this.props;
-    const { tags, jobAndUserNum, categoryGroup } = monitor;
+    const { tags, jobAndUserNum, categoryGroup, crawlerStatus } = monitor;
     let jobNum = 0;
     let userNum = 0;
     jobNum = jobAndUserNum && jobAndUserNum.totalJob;
     userNum = categoryGroup && jobAndUserNum.totalUser;
-    let top1 = {name:' ', value: 0},
-        top2 = {name:' ', value: 0},
-        top3 = {name:' ', value: 0};
+    let top1 = {name:' ', value: 0};
+    let top2 = {name:' ', value: 0};
+    let top3 = {name:' ', value: 0};
+    const currCrawlerStatus = crawlerStatus && crawlerStatus[0].status;
     // const tags = [];
     // for (let i = 0; i < 50; i += 1) {
     //   tags.push({
@@ -213,7 +217,14 @@ class Monitor extends Component {
               style={{ marginBottom: 24 }}
               bordered={false}
             >
-              <ActiveChart />
+              <Statistic
+                title={currCrawlerStatus ? "Active": "Stop"}
+                value={currCrawlerStatus ? "运行中": "停止中"}
+                precision={2}
+                valueStyle={{ color: currCrawlerStatus ? '#3f8600' : '#cf1322'}}
+                prefix={<Icon type={currCrawlerStatus ? "play-circle" : "stop"} />}
+                suffix=""
+              />
             </Card>
           </Col>
           <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
@@ -223,7 +234,7 @@ class Monitor extends Component {
               bordered={false}
               bodyStyle={{ overflow: 'hidden' }}
             >
-              <TagCloud data={tags} height={512} weight={4} padding={10}/>
+              <TagCloud data={tags} height={368} weight={4} padding={10}/>
             </Card>
           </Col>
         </Row>

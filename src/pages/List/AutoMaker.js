@@ -42,7 +42,7 @@ class TableList extends PureComponent {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, form } = this.props;
     this.timerID = setInterval(
       () => {
         dispatch({
@@ -50,9 +50,12 @@ class TableList extends PureComponent {
           payload: {}
         });
       },
-      1200
+      1500
     );
-    this.props.form.validateFields();
+    dispatch({
+      type: 'automaker/getMenuList'
+    });
+    form.validateFields();
   }
 
   // renderForm() {
@@ -94,7 +97,8 @@ class TableList extends PureComponent {
   render() {
     const {
       automaker: {
-        logList
+        logList,
+        menuList
       },
       form
     } = this.props;
@@ -125,16 +129,20 @@ class TableList extends PureComponent {
 
     function renderCity () {
       const arr = ['北京', '上海', '杭州', '广州', '深圳', '成都', '武汉', '江苏'];
-      let options = [];
-      arr.forEach((curr, index, arr) => {
+      const options = [];
+      arr.forEach((curr) => {
         options.push(<Option value={curr}>{curr}</Option>)
       })
       return options;
     }
 
     function renderMenu () {
-      const arr = ['Java', 'C', 'web前端', 'Android', 'HTML5', 'Python', '网络工程师', 'PHP', '数据挖掘', '运维工程师'];
-      let options = [];
+      // const arr = ['Java', 'C', 'web前端', 'Android', 'HTML5', 'Python', '网络工程师', 'PHP', '数据挖掘', '运维工程师'];
+      let arr = []
+      arr = menuList.map((curr) => {
+        return curr.name;
+      })
+      const options = [];
       arr.forEach((curr, index, arr) => {
         options.push(<Option value={curr}>{curr}</Option>)
       })
@@ -167,7 +175,7 @@ class TableList extends PureComponent {
                   rules: [{ required: false}],
                 })(
                   <Select mode="multiple" placeholder="职位类别">
-                    {renderMenu()}
+                    {menuList && renderMenu()}
                   </Select>
                 )}
               </Form.Item>
