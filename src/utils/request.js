@@ -33,6 +33,7 @@ const errorHandler = error => {
   const { status, url } = response;
 
   if (status === 401) {
+    window.localStorage.removeItem('jwt_token');
     notification.error({
       message: '未登录或登录已过期，请重新登录。',
     });
@@ -67,6 +68,19 @@ const errorHandler = error => {
 const request = extend({
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
+});
+
+request.interceptors.request.use((url, options) => {
+  const token = window.localStorage.getItem('jwt_token');
+  if (token) {
+    options.headers['Authorization'] =`Bearer ${token}`;
+  }
+  return (
+    {
+      url,
+      options,
+    }
+  );
 });
 
 export default request;

@@ -4,7 +4,9 @@ export interface ITagCloudProps {
     name: string;
     value: number;
   }>;
-  height: number;
+  height?: number;
+  padding?: number;
+  weight: number;
   style?: React.CSSProperties;
 }
 

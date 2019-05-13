@@ -76,10 +76,10 @@ export default {
     'primary-color': primaryColor,
   },
   proxy: {
-    '/server/api/': {
-      target: 'https://preview.pro.ant.design/',
+    '/api': {
+      target: 'http://localhost:3000/api/',
       changeOrigin: true,
-      pathRewrite: { '^/server': '' },
+      pathRewrite: { '^/api': '' },
     },
   },
   // proxy: {
@@ -89,12 +89,12 @@ export default {
   //     pathRewrite: { '^/server': '' },
   //   },
   // },
-  proxy: {
-    '/api': {
-      target: 'http://localhost:3000/',
-      changeOrigin: true
-    },
-  },
+  // proxy: {
+  //   '/api': {
+  //     target: 'http://localhost:3000/',
+  //     changeOrigin: true
+  //   },
+  // },
   ignoreMomentLocale: true,
   lessLoaderOptions: {
     javascriptEnabled: true,

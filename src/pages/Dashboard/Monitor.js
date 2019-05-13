@@ -29,120 +29,23 @@ const havePermissionAsync = new Promise(resolve => {
 class Monitor extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
-    // dispatch({
-    //   type: 'monitor/fetchTags',
-    // });
+    dispatch({
+      type: 'monitor/fetchTags',
+    });
   }
 
   render() {
     const { monitor, loading } = this.props;
     const { tags } = monitor;
-
+    // const tags = [];
+    // for (let i = 0; i < 50; i += 1) {
+    //   tags.push({
+    //     name: `TagClout-Title-${i}`,
+    //     value: Math.floor(Math.random() * 50) + 20,
+    //   });
+    // }
     return (
       <GridContent>
-        {/* <Row gutter={24}>
-          <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
-            <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.trading-activity"
-                  defaultMessage="Real-Time Trading Activity"
-                />
-              }
-              bordered={false}
-            >
-              <Row>
-                <Col md={6} sm={12} xs={24}>
-                  <NumberInfo
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.total-transactions"
-                        defaultMessage="Total transactions today"
-                      />
-                    }
-                    suffix="元"
-                    total={numeral(124543233).format('0,0')}
-                  />
-                </Col>
-                <Col md={6} sm={12} xs={24}>
-                  <NumberInfo
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.sales-target"
-                        defaultMessage="Sales target completion rate"
-                      />
-                    }
-                    total="92%"
-                  />
-                </Col>
-                <Col md={6} sm={12} xs={24}>
-                  <NumberInfo
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.remaining-time"
-                        defaultMessage="Remaining time of activity"
-                      />
-                    }
-                    total={<CountDown target={targetTime} />}
-                  />
-                </Col>
-                <Col md={6} sm={12} xs={24}>
-                  <NumberInfo
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.total-transactions-per-second"
-                        defaultMessage="Total transactions per second"
-                      />
-                    }
-                    suffix="元"
-                    total={numeral(234).format('0,0')}
-                  />
-                </Col>
-              </Row>
-              <div className={styles.mapChart}>
-                <Tooltip
-                  title={
-                    <FormattedMessage
-                      id="app.monitor.waiting-for-implementation"
-                      defaultMessage="Waiting for implementation"
-                    />
-                  }
-                >
-                  <img
-                    src="https://gw.alipayobjects.com/zos/antfincdn/h%24wFbzuuzz/HBWnDEUXCnGnGrRfrpKa.png"
-                    alt="map"
-                  />
-                </Tooltip>
-              </div>
-            </Card>
-          </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.activity-forecast"
-                  defaultMessage="Activity forecast"
-                />
-              }
-              style={{ marginBottom: 24 }}
-              bordered={false}
-            >
-              <ActiveChart />
-            </Card>
-            <Card
-              title={<FormattedMessage id="app.monitor.efficiency" defaultMessage="Efficiency" />}
-              style={{ marginBottom: 24 }}
-              bodyStyle={{ textAlign: 'center' }}
-              bordered={false}
-            >
-              <Gauge
-                title={formatMessage({ id: 'app.monitor.ratio', defaultMessage: 'Ratio' })}
-                height={180}
-                percent={87}
-              />
-            </Card>
-          </Col>
-        </Row>
         <Row gutter={24}>
           <Col xl={12} lg={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
@@ -202,12 +105,7 @@ class Monitor extends Component {
           </Col>
           <Col xl={6} lg={12} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.popular-searches"
-                  defaultMessage="Popular Searches"
-                />
-              }
+              title="热门搜索？"
               loading={loading}
               bordered={false}
               bodyStyle={{ overflow: 'hidden' }}
@@ -235,7 +133,45 @@ class Monitor extends Component {
               />
             </Card>
           </Col>
-        </Row>*/}
+        </Row>
+        <Row gutter={24}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
+            <Card
+              title={
+                <FormattedMessage
+                  id="app.monitor.activity-forecast"
+                  defaultMessage="Activity forecast"
+                />
+              }
+              style={{ marginBottom: 24 }}
+              bordered={false}
+            >
+              <ActiveChart />
+            </Card>
+            <Card
+              title={<FormattedMessage id="app.monitor.efficiency" defaultMessage="Efficiency" />}
+              style={{ marginBottom: 24 }}
+              bodyStyle={{ textAlign: 'center' }}
+              bordered={false}
+            >
+              <Gauge
+                title={formatMessage({ id: 'app.monitor.ratio', defaultMessage: 'Ratio' })}
+                height={180}
+                percent={87}
+              />
+            </Card>
+          </Col>
+          <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+            <Card
+              title="热门标签统计"
+              loading={loading}
+              bordered={false}
+              bodyStyle={{ overflow: 'hidden' }}
+            >
+              <TagCloud data={tags} height={512} weight={4} padding={10}/>
+            </Card>
+          </Col>
+        </Row>
       </GridContent>
     );
   }

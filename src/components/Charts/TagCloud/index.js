@@ -81,12 +81,13 @@ class TagCloud extends Component {
   @Debounce(500)
   renderChart(nextProps) {
     // const colors = ['#1890FF', '#41D9C7', '#2FC25B', '#FACC14', '#9AE65C'];
-    const { data, height } = nextProps || this.props;
+    const { data, height, weight, padding } = nextProps || this.props;
 
     if (data.length < 1 || !this.root) {
       return;
     }
-
+    const fontWeight = weight || 1;
+    const p = padding || 0;
     const h = height;
     const w = this.root.offsetWidth;
 
@@ -100,14 +101,14 @@ class TagCloud extends Component {
         imageMask: this.imageMask,
         font: 'Verdana',
         size: [w, h], // 宽高设置最好根据 imageMask 做调整
-        padding: 0,
+        padding: p,
         timeInterval: 5000, // max execute time
         rotate() {
           return 0;
         },
         fontSize(d) {
           // eslint-disable-next-line
-          return Math.pow((d.value - min) / (max - min), 2) * (17.5 - 5) + 5;
+          return Math.pow((d.value - min) / (max - min), 2) * (17.5 - 5) + 5 * fontWeight;
         },
       });
 

@@ -1,4 +1,4 @@
-import { queryTags } from '@/services/api';
+import { getTagCloud } from '@/services/api';
 
 export default {
   namespace: 'monitor',
@@ -9,16 +9,16 @@ export default {
 
   effects: {
     *fetchTags(_, { call, put }) {
-      const response = yield call(queryTags);
+      const response = yield call(getTagCloud);
       yield put({
-        type: 'saveTags',
-        payload: response.list,
+        type: 'saveTagCloud',
+        payload: response.result,
       });
     },
   },
 
   reducers: {
-    saveTags(state, action) {
+    saveTagCloud(state, action) {
       return {
         ...state,
         tags: action.payload,

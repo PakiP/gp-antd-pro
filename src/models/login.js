@@ -21,6 +21,7 @@ export default {
       });
       // Login successfully
       if (response.status === 'ok') {
+        window.localStorage.setItem('jwt_token', response.token);
         reloadAuthorized();
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
