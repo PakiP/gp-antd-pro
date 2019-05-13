@@ -33,7 +33,6 @@ export async function pageLog(params) {
 }
 
 export async function pageJobList(params) {
-  console.log(params);
   return request('/api/manage/pageJobList', {
     method: 'POST',
     data: {
@@ -41,6 +40,35 @@ export async function pageJobList(params) {
       method: 'post',
     },
   });
+}
+
+export async function pageUserList(params) {
+  return request('/api/manage/pageUserList', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function changeJobStatus(params) {
+  return request('/api/manage/changeJobStatus', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function updateJobDetail(params) {
+  return request(`/api/manage/updateJobDetail?${stringify(params)}`);
+}
+
+
+export async function getUserCollectionList(params) {
+  return request(`/api/manage/getUserCollectionList?${stringify(params)}`);
 }
 
 export async function queryProjectNotice() {
@@ -169,5 +197,13 @@ export async function getFakeCaptcha(mobile) {
 
 export async function getTagCloud() {
   return request(`/api/manage/getTagCloud`);
+}
+
+export async function getJobAndUserNum() {
+  return request(`/api/manage/getJobAndUserNum`);
+}
+
+export async function getCategoryGroup() {
+  return request(`/api/manage/getCategoryGroup`);
 }
 

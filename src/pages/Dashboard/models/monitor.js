@@ -1,4 +1,4 @@
-import { getTagCloud } from '@/services/api';
+import { getTagCloud, getJobAndUserNum, getCategoryGroup } from '@/services/api';
 
 export default {
   namespace: 'monitor',
@@ -15,6 +15,20 @@ export default {
         payload: response.result,
       });
     },
+    *getJobAndUserNum(_, { call, put }) {
+      const response = yield call(getJobAndUserNum);
+      yield put({
+        type: 'saveJobAndUserNum',
+        payload: response.result,
+      });
+    },
+    *getCategoryGroup(_, { call, put }) {
+      const response = yield call(getCategoryGroup);
+      yield put({
+        type: 'saveCategoryGroup',
+        payload: response.result,
+      });
+    },
   },
 
   reducers: {
@@ -22,6 +36,18 @@ export default {
       return {
         ...state,
         tags: action.payload,
+      };
+    },
+    saveJobAndUserNum(state, action) {
+      return {
+        ...state,
+        jobAndUserNum: action.payload,
+      };
+    },
+    saveCategoryGroup(state, action) {
+      return {
+        ...state,
+        categoryGroup: action.payload,
       };
     },
   },

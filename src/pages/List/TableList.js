@@ -14,11 +14,20 @@ import {
   Dropdown,
   Menu,
   message,
-  Table
+  Table,
+  Divider,
+  Modal,
+  Comment,
+  Avatar,
+  Tooltip,
+  Tag,
+  notification
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import {salaryArr, workYearArr, companySizeArr, financeStageArr} from '@/config/query';
 
 import styles from './TableList.less';
+// import { resolve } from 'dns';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -45,7 +54,10 @@ class TableList extends PureComponent {
     selectedRows: [],
     formValues: {},
     pageNo: 1,
-    pageSize: 10
+    pageSize: 10,
+    loading: false,
+    visible: false,
+    detail: {}
   };
 
   columns = [
@@ -58,10 +70,6 @@ class TableList extends PureComponent {
       title: '职位',
       dataIndex: 'name',
       width: 40
-    },
-    {
-      title: '链接',
-      dataIndex: 'detailLink',
     },
     {
       title: '薪资',
@@ -78,26 +86,59 @@ class TableList extends PureComponent {
     {
       title: '工作经验',
       dataIndex: 'workYear',
+      render: (val) => (
+        <span>
+          {
+            workYearArr.map(curr => {
+              if (curr.value === val) {
+                return curr.label
+              }
+            })
+          }
+        </span>
+      )
     },
+    // {
+    //   title: '学历',
+    //   dataIndex: 'education',
+    // },
+    // {
+    //   title: '公司',
+    //   dataIndex: 'companyName',
+    // },
+    // {
+    //   title: '融资',
+    //   dataIndex: 'financeStage',
+    //   render: (val) => (
+    //     <span>
+    //       {
+    //         financeStageArr.map(curr => {
+    //           if (curr.value === val) {
+    //             return curr.label
+    //           }
+    //         })
+    //       }
+    //     </span>
+    //   )
+    // },
+    // {
+    //   title: '规模',
+    //   dataIndex: 'companySize',
+    //   render: (val) => (
+    //     <span>
+    //       {
+    //         companySizeArr.map(curr => {
+    //           if (curr.value === val) {
+    //             return curr.label
+    //           }
+    //         })
+    //       }
+    //     </span>
+    //   )
+    // },
     {
-      title: '学历',
-      dataIndex: 'education',
-    },
-    {
-      title: '公司',
-      dataIndex: 'companyName',
-    },
-    {
-      title: '融资',
-      dataIndex: 'financeStage',
-    },
-    {
-      title: '规模',
-      dataIndex: 'companySize',
-    },
-    {
-      title: '入库时间',
-      dataIndex: 'createTime',
+      title: '更新时间',
+      dataIndex: 'updateTime',
       render: (text) => moment(+text).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
@@ -105,16 +146,27 @@ class TableList extends PureComponent {
       dataIndex: 'isComplete',
       render: text => text === 0 ? '否' : '是',
     },
-    // {
-    //   title: '操作',
-    //   render: (text, record) => (
-    //     <Fragment>
-    //       <a onClick={() => {}}>操作</a>
-    //       {/* <Divider type="vertical" />
-    //       <a href="">订阅警报</a> */}
-    //     </Fragment>
-    //   ),
-    // },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      render: text => text === 1 ? '启用中' : '禁用中',
+    },
+    {
+      title: '操作',
+      render: (text, record) => (
+        <span>
+          <a href="javascript:;" onClick={() => this.showModal(record)}>查看</a>
+          <Divider type="vertical" />
+          <a href="javascript:;" onClick={() => this.handleDisabled(record._id, record.status)}>{record.status ? '禁用' : '启用'}</a>
+          {record.isComplete ? '' : (
+            <span>
+              <Divider type="vertical" />
+              <a href="javascript:;" onClick={() => this.handleUpdateDetail(record._id)}>更新</a>
+            </span>
+          )}
+        </span>
+      ),
+    },
   ];
 
   componentDidMount() {
@@ -123,10 +175,98 @@ class TableList extends PureComponent {
       type: 'jobList/pageJobList',
       payload: {
         pageNo: 1,
-        pageSize: 10
+        pageSize: 10,
+        query: {}
       }
     });
   }
+
+  showModal = (record) => {
+    this.setState({
+      visible: true,
+      detail: record
+    });
+    // console.log(record)
+  };
+
+  handleGetDetail = () => {
+    console.log('handleGetDetail')
+  }
+
+  handleUpdateDetail = (id) => {
+    const { dispatch } = this.props;
+    new Promise((resolve) => {
+      dispatch({
+        type: 'jobList/updateJobDetail',
+        payload: {
+          resolve,
+          id
+        }
+      });
+    }).then((res) => {
+      if (res.success) {
+        notification.success({
+          message: '操作成功',
+        });
+        const params = {
+          pageNo: this.state.pageNo,
+          pageSize: this.state.pageSize,
+          query: this.state.formValues
+        };
+        dispatch({
+          type: 'jobList/pageJobList',
+          payload: params,
+        })
+      } else {
+        notification.error({
+          message: '操作失败',
+        });
+      }
+    })
+  }
+
+  handleDisabled = (id, status) => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    new Promise((resolve) => {
+      dispatch({
+        type: 'jobList/changeJobStatus',
+        payload: {
+          resolve,
+          id,
+          status
+        }
+      });
+    }).then((res) => {
+      if (res.success) {
+        this.setState(
+          { loading: false, visible: false },
+          () => {
+            notification.success({
+              message: '操作成功',
+            });
+          }
+        );
+        const params = {
+          pageNo: this.state.pageNo,
+          pageSize: this.state.pageSize,
+          query: this.state.formValues
+        };
+        dispatch({
+          type: 'jobList/pageJobList',
+          payload: params,
+        })
+      } else {
+        notification.error({
+          message: '操作失败',
+        });
+      }
+    })
+  };
+
+  handleCancel = () => {
+    this.setState({ visible: false });
+  };
 
   previewItem = id => {
     router.push(`/profile/basic/${id}`);
@@ -137,11 +277,21 @@ class TableList extends PureComponent {
     form.resetFields();
     this.setState({
       formValues: {},
+    }, () => {
+      const params = {
+        pageNo: this.state.pageNo,
+        pageSize: this.state.pageSize,
+        query: this.state.formValues
+      };
+      dispatch({
+        type: 'jobList/pageJobList',
+        payload: params,
+      })
     });
-    dispatch({
-      type: 'rule/fetch',
-      payload: {},
-    });
+    // dispatch({
+    //   type: 'rule/fetch',
+    //   payload: {},
+    // });
   };
 
   toggleForm = () => {
@@ -196,12 +346,21 @@ class TableList extends PureComponent {
 
       this.setState({
         formValues: values,
+      }, () => {
+        const params = {
+          pageNo: this.state.pageNo,
+          pageSize: this.state.pageSize,
+          query: this.state.formValues
+        };
+        dispatch({
+          type: 'jobList/pageJobList',
+          payload: params,
+        })
       });
-
-      dispatch({
-        type: 'rule/fetch',
-        payload: values,
-      });
+      // dispatch({
+      //   type: 'rule/fetch',
+      //   payload: values,
+      // });
     });
   };
 
@@ -238,10 +397,14 @@ class TableList extends PureComponent {
   };
 
   changePage(current){
+    this.setState({
+      pageNo: current,
+    });
     const { dispatch } = this.props;
     const params = {
       pageNo: current,
       pageSize: this.state.pageSize,
+      query: this.state.formValues
     };
     dispatch({
       type: 'jobList/pageJobList',
@@ -256,7 +419,9 @@ class TableList extends PureComponent {
     });
     const { dispatch } = this.props;
     const params = {
+      pageNo: this.state.pageNo,
       pageSize: pageSize,
+      query: this.state.formValues
     };
     dispatch({
       type: 'jobList/pageJobList',
@@ -300,10 +465,12 @@ class TableList extends PureComponent {
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="-1">不限</Option>
                   <Option value="0">应届毕业生</Option>
-                  <Option value="1">1-3年</Option>
-                  <Option value="2">3-5年</Option>
-                  <Option value="3">5-10年</Option>
-                  <Option value="4">10年以上</Option>
+                  <Option value="1">1年以下</Option>
+                  <Option value="2">1-3年</Option>
+                  <Option value="3">3-5年</Option>
+                  <Option value="4">5-10年</Option>
+                  <Option value="5">10年以上</Option>
+                  <Option value="6">经验不限</Option>
                 </Select>
               )}
             </FormItem>
@@ -319,14 +486,15 @@ class TableList extends PureComponent {
             <FormItem label="公司融资">
               {getFieldDecorator('stage')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="-1">未融资</Option>
-                  <Option value="0">天使轮</Option>
-                  <Option value="1">A轮</Option>
-                  <Option value="2">B轮</Option>
-                  <Option value="3">C轮</Option>
-                  <Option value="4">D轮及以上</Option>
-                  <Option value="5">上市公司</Option>
-                  <Option value="6">不需要融资</Option>
+                  <Option value="-1">不限</Option>
+                  <Option value="0">未融资</Option>
+                  <Option value="1">天使轮</Option>
+                  <Option value="2">A轮</Option>
+                  <Option value="3">B轮</Option>
+                  <Option value="4">C轮</Option>
+                  <Option value="5">D轮及以上</Option>
+                  <Option value="6">上市公司</Option>
+                  <Option value="7">不需要融资</Option>
                 </Select>
               )}
             </FormItem>
@@ -335,6 +503,7 @@ class TableList extends PureComponent {
             <FormItem label="规模">
               {getFieldDecorator('size')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <Option value="-1">不限</Option>
                   <Option value="0">少于15人</Option>
                   <Option value="1">15-50人</Option>
                   <Option value="2">50-150人</Option>
@@ -360,29 +529,52 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="信息是否完整">
-              {getFieldDecorator('isCompelete')(
+            <FormItem label="月薪">
+              {getFieldDecorator('salary')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">不完整</Option>
-                  <Option value="1">完整</Option>
+                  <Option value="-1">不限</Option>
+                  <Option value="0">2k以下</Option>
+                  <Option value="1">2-5k</Option>
+                  <Option value="2">5-10k</Option>
+                  <Option value="3">10-15k</Option>
+                  <Option value="4">15-25k</Option>
+                  <Option value="5">25-50k</Option>
+                  <Option value="6">50k以上</Option>
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="信息是否完整">
+              {getFieldDecorator('isComplete')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <Option value="-1">不限</Option>
+                  <Option value="0">否</Option>
+                  <Option value="1">是</Option>
                 </Select>
               )}
             </FormItem>
           </Col>
         </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-            {/* <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
-            </a> */}
-          </div>
-        </div>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}></Col>
+          <Col md={8} sm={24}></Col>
+          <Col md={8} sm={24}>
+            <div style={{ overflow: 'hidden', textAlign: 'right' }}>
+              <div style={{ marginBottom: 24, display: 'inline-block'  }}>
+                <Button type="primary" htmlType="submit">
+                  查询
+                </Button>
+                <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+                  重置
+                </Button>
+                {/* <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+                  收起 <Icon type="up" />
+                </a> */}
+              </div>
+            </div>
+          </Col>
+        </Row>
       </Form>
     );
   }
@@ -392,16 +584,15 @@ class TableList extends PureComponent {
   }
 
   render() {
-    const {
-      jobList: { data }
-    } = this.props;
-    const { selectedRows } = this.state;
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="approval">批量审批</Menu.Item>
-      </Menu>
-    );
+    const { jobList } = this.props;
+    const { data } = jobList;
+    const { selectedRows, visible, loading, detail } = this.state;
+    // const menu = (
+    //   <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
+    //     <Menu.Item key="remove">删除</Menu.Item>
+    //     <Menu.Item key="approval">批量审批</Menu.Item>
+    //   </Menu>
+    // );
 
     const paginationProps = {
       showSizeChanger: true,
@@ -414,16 +605,140 @@ class TableList extends PureComponent {
       onChange: (current) => this.changePage(current),
     };
 
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 12 },
+        sm: { span: 4 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    };
+
+    const tailFormItemLayout = {
+      wrapperCol: {
+        xs: {
+          span: 24,
+          offset: 0,
+        },
+        sm: {
+          span: 16,
+          offset: 8,
+        },
+      },
+    };
+
+    const detailDiv = (
+      <Form {...formItemLayout}>
+        <Form.Item label="id">{detail.positionId}</Form.Item>
+        <Form.Item label="职位">
+          <a href={detail.detailLink} target="view_window">{detail.name}</a>
+        </Form.Item>
+        <Form.Item label="薪资">{detail.salary}</Form.Item>
+        <Form.Item label="城市|地区">{detail.city} | {detail.area}</Form.Item>
+        <Form.Item label="学历">{detail.education}</Form.Item>
+        <Form.Item label="经验">
+          {
+            detail.workYear &&
+            workYearArr.map(curr => {
+              if (curr.value === detail.workYear) {
+                return curr.label
+              }
+            })
+          }
+        </Form.Item>
+        <Form.Item label="标签">
+          { detail.industryLables &&
+            detail.industryLables.map((item) => {
+              return (<Tag color="cyan">{item}</Tag>)
+            })
+          }
+        </Form.Item>
+        <Form.Item label="公司">
+          <a href={detail.companyUrl} target="view_window">{detail.companyName}</a>
+        </Form.Item>
+        <Form.Item label="地址">{detail.isComplete ? detail.workAddr : '待更新'}</Form.Item>
+        <Form.Item label="融资">
+          {
+            detail.financeStage &&
+            financeStageArr.map(curr => {
+              if (curr.value === detail.financeStage) {
+                return curr.label
+              }
+            })
+          }
+        </Form.Item>
+        <Form.Item label="规模">
+          {
+            detail.companySize &&
+            companySizeArr.map(curr => {
+              if (curr.value === detail.companySize) {
+                return curr.label
+              }
+            })
+          }
+        </Form.Item>
+        <Form.Item label="公司标签">
+          { detail.industryField &&
+            detail.industryField.map((item) => {
+              return (<Tag color="cyan">{item}</Tag>)
+            })
+          }
+        </Form.Item>
+        <Form.Item label="优势">{detail.positionAdvantage}</Form.Item>
+        <Form.Item label="创建时间">{moment(+detail.createTime).format('YYYY-MM-DD HH:mm:ss')}</Form.Item>
+        <Form.Item label="更新时间">{moment(+detail.updateTime).format('YYYY-MM-DD HH:mm:ss')}</Form.Item>
+        <Form.Item label="发布时间">{moment(+detail.formatTime).format('YYYY-MM-DD HH:mm:ss')}</Form.Item>
+        <Form.Item label="状态">{detail.status ? '启用中' : '禁用中'}</Form.Item>
+        <Form.Item label="详细信息">
+          {
+            detail.isComplete ?
+            <div dangerouslySetInnerHTML={{__html: detail.jobDetail}}></div>
+            : (
+              <Button key="back" type="primary" onClick={() => this.handleUpdateDetail(detail._id)}>
+                更新详细信息
+              </Button>
+            )
+          }
+        </Form.Item>
+      </Form>
+    );
+
     return (
       <PageHeaderWrapper title="查询表格">
+        <Modal
+          visible={visible}
+          title="职位详情"
+          onCancel={this.handleCancel}
+          className={styles.modal}
+          footer={[
+            <Button key="back" onClick={this.handleCancel}>
+              返回
+            </Button>,
+            <Button key="submit" type="danger" loading={loading} onClick={() => this.handleDisabled(detail._id, detail.status)}>
+              {detail.status ? '禁用' : '启用'}
+            </Button>,
+          ]}
+        >
+          <Comment
+            avatar={
+              <Avatar
+                src={detail.companyLogo}
+                alt="Han Solo"
+              />
+            }
+            content={detailDiv}
+          />
+        </Modal>
         <Card bordered={false} title="职位列表">
           <div className={styles.tableList}>
-            {/* <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}> */}
-              {/* <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+            <div className={styles.tableListForm}>{this.renderForm()}</div>
+            {/* <div className={styles.tableListOperator}>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
-              </Button> */}
-              {/* {selectedRows.length > 0 && (
+              </Button>
+              {selectedRows.length > 0 && (
                 <span>
                   <Button>批量操作</Button>
                   <Dropdown overlay={menu}>

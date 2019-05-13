@@ -53,6 +53,7 @@ export default {
           currentAuthority: 'guest',
         },
       });
+      window.localStorage.removeItem('jwt_token');
       reloadAuthorized();
       // redirect
       if (window.location.pathname !== '/user/login') {

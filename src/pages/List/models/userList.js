@@ -1,36 +1,30 @@
-import { pageJobList, changeJobStatus, updateJobDetail } from '@/services/api';
+import { pageUserList, getUserCollectionList } from '@/services/api';
 
 export default {
-  namespace: 'jobList',
+  namespace: 'userList',
 
   state: {
     data: {
       list: [],
       pagination: {},
+      collectionList: {}
     },
   },
 
   effects: {
-    *pageJobList({ payload }, { call, put }) {
-      const response = yield call(pageJobList, payload);
+    *pageUserList({ payload }, { call, put }) {
+      const response = yield call(pageUserList, payload);
       yield put({
-        type: 'save',
+        type: 'saveUserList',
         payload: response,
       });
     },
-    *changeJobStatus({ payload }, { call, put }) {
-      const { resolve } = payload;
-      const response = yield call(changeJobStatus, payload);
-      // yield put({
-      //   type: 'saveJobStatus',
-      //   payload: response,
-      // });
-      !!resolve && resolve(response);
-    },
-    *updateJobDetail({ payload }, { call, put }) {
-      const { resolve } = payload;
-      const response = yield call(updateJobDetail, payload);
-      !!resolve && resolve(response);
+    *getUserCollectionList({ payload }, { call, put }) {
+      const response = yield call(getUserCollectionList, payload);
+      yield put({
+        type: 'saveUserCollectionList',
+        payload: response,
+      });
     },
     // *add({ payload, callback }, { call, put }) {
     //   const response = yield call(addRule, payload);
@@ -59,19 +53,19 @@ export default {
   },
 
   reducers: {
-    save(state, action) {
+    saveUserList(state, action) {
       const res = action.payload.result;
       return {
         ...state,
         data: res,
       };
     },
-    saveJobStatus(state, action) {
+    saveUserCollectionList(state, action) {
       const res = action.payload.result;
-      console.log(res);
       return {
         ...state,
+        collectionList: res,
       };
-    },
+    }
   },
 };

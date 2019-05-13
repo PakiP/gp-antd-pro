@@ -107,6 +107,7 @@ class BasicLayout extends React.Component {
       menuData,
       breadcrumbNameMap,
       fixedHeader,
+      currentUser
     } = this.props;
 
 
@@ -129,14 +130,14 @@ class BasicLayout extends React.Component {
             minHeight: '100vh',
           }}
         >
-          {/* <Header
+          <Header
             menuData={menuData}
             handleMenuCollapse={this.handleMenuCollapse}
             logo={logo}
             isMobile={isMobile}
-            // currentUser={currentUser}
+            currentUser={currentUser}
             {...this.props}
-          /> */}
+          />
           <Content className={styles.content} style={contentStyle}>
             {children}
           </Content>

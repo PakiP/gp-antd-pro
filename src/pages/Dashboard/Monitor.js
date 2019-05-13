@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi-plugin-react/locale';
-import { Row, Col, Card, Tooltip } from 'antd';
-import { Pie, WaterWave, Gauge, TagCloud } from '@/components/Charts';
+import { Row, Col, Card, Tooltip, Icon } from 'antd';
+import { Pie, WaterWave, Gauge, TagCloud, ChartCard, yuan, MiniBar, Field } from '@/components/Charts';
 import NumberInfo from '@/components/NumberInfo';
 import CountDown from '@/components/CountDown';
 import ActiveChart from '@/components/ActiveChart';
@@ -10,6 +10,7 @@ import numeral from 'numeral';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import styles from './Monitor.less';
+import moment from 'moment';
 
 const { Secured } = Authorized;
 
@@ -32,11 +33,24 @@ class Monitor extends Component {
     dispatch({
       type: 'monitor/fetchTags',
     });
+    dispatch({
+      type: 'monitor/getJobAndUserNum',
+    });
+    dispatch({
+      type: 'monitor/getCategoryGroup',
+    });
   }
 
   render() {
     const { monitor, loading } = this.props;
-    const { tags } = monitor;
+    const { tags, jobAndUserNum, categoryGroup } = monitor;
+    let jobNum = 0;
+    let userNum = 0;
+    jobNum = jobAndUserNum && jobAndUserNum.totalJob;
+    userNum = categoryGroup && jobAndUserNum.totalUser;
+    let top1 = {name:' ', value: 0},
+        top2 = {name:' ', value: 0},
+        top3 = {name:' ', value: 0};
     // const tags = [];
     // for (let i = 0; i < 50; i += 1) {
     //   tags.push({
@@ -44,17 +58,43 @@ class Monitor extends Component {
     //     value: Math.floor(Math.random() * 50) + 20,
     //   });
     // }
+    const visitData = [];
+    const beginDay = new Date().getTime();
+    for (let i = 0; i < 20; i += 1) {
+      visitData.push({
+        x: moment(new Date(beginDay + 1000 * 60 * 60 * 24 * i)).format('YYYY-MM-DD'),
+        y: Math.floor(Math.random() * 100) + 10,
+      });
+    }
+    let salesPieData = [{
+      x: 'java',
+      y: 100,
+    }]
+    if (categoryGroup && categoryGroup.length) {
+      categoryGroup.forEach((item) => {
+        item['x'] = item['_id'];
+        item['y'] = item['value'];
+      });
+      top1 = {
+        name: categoryGroup[0]['_id'],
+        value: Math.round(categoryGroup[0]['value'] / jobNum * 100),
+      }
+      top2 = {
+        name: categoryGroup[1]['_id'],
+        value: Math.round(categoryGroup[1]['value'] / jobNum * 100),
+      }
+      top3 = {
+        name: categoryGroup[2]['_id'],
+        value: Math.round(categoryGroup[2]['value'] / jobNum * 100),
+      }
+      salesPieData = categoryGroup
+    }
     return (
       <GridContent>
         <Row gutter={24}>
           <Col xl={12} lg={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.proportion-per-category"
-                  defaultMessage="Proportion Per Category"
-                />
-              }
+              title='职位数量前三'
               bordered={false}
               className={styles.pieCard}
             >
@@ -62,11 +102,9 @@ class Monitor extends Component {
                 <Col span={8}>
                   <Pie
                     animate={false}
-                    percent={28}
-                    subTitle={
-                      <FormattedMessage id="app.monitor.fast-food" defaultMessage="Fast food" />
-                    }
-                    total="28%"
+                    percent={top1.value}
+                    subTitle={top1.name}
+                    total={`${top1.value}%`}
                     height={128}
                     lineWidth={2}
                   />
@@ -75,14 +113,9 @@ class Monitor extends Component {
                   <Pie
                     animate={false}
                     color="#5DDECF"
-                    percent={22}
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.western-food"
-                        defaultMessage="Western food"
-                      />
-                    }
-                    total="22%"
+                    percent={top2.value}
+                    subTitle={top2.name}
+                    total={`${top2.value}%`}
                     height={128}
                     lineWidth={2}
                   />
@@ -91,11 +124,9 @@ class Monitor extends Component {
                   <Pie
                     animate={false}
                     color="#2FC25B"
-                    percent={32}
-                    subTitle={
-                      <FormattedMessage id="app.monitor.hot-pot" defaultMessage="Hot pot" />
-                    }
-                    total="32%"
+                    percent={top3.value}
+                    subTitle={top3.name}
+                    total={`${top3.value}%`}
                     height={128}
                     lineWidth={2}
                   />
@@ -104,61 +135,85 @@ class Monitor extends Component {
             </Card>
           </Col>
           <Col xl={6} lg={12} sm={24} xs={24} style={{ marginBottom: 24 }}>
-            <Card
-              title="热门搜索？"
-              loading={loading}
-              bordered={false}
-              bodyStyle={{ overflow: 'hidden' }}
-            >
-              <TagCloud data={tags} height={161} />
-            </Card>
-          </Col>
-          <Col xl={6} lg={12} sm={24} xs={24} style={{ marginBottom: 24 }}>
-            <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.resource-surplus"
-                  defaultMessage="Resource Surplus"
+            <ChartCard
+              title="职位总数"
+              avatar={
+                <img
+                  alt="indicator"
+                  style={{ width: 56, height: 56 }}
+                  src="https://gw.alipayobjects.com/zos/rmsportal/dURIMkkrRFpPgTuzkwnB.png"
                 />
               }
-              bodyStyle={{ textAlign: 'center', fontSize: 0 }}
-              bordered={false}
+              contentHeight={146}
+              action={
+                <Tooltip title="职位总数">
+                  <Icon type="info-circle-o" />
+                </Tooltip>
+              }
+              total={() => <span dangerouslySetInnerHTML={{ __html: jobNum }} />}
+            />
+            <ChartCard
+              title="用户总数"
+              style={{marginTop: 52}}
+              avatar={
+                <img
+                  alt="indicator"
+                  style={{ width: 56, height: 56 }}
+                  src="https://gw.alipayobjects.com/zos/rmsportal/dURIMkkrRFpPgTuzkwnB.png"
+                />
+              }
+              action={
+                <Tooltip title="用户总数">
+                  <Icon type="info-circle-o" />
+                </Tooltip>
+              }
+              total={() => <span dangerouslySetInnerHTML={{ __html: userNum }} />}
+            />
+          </Col>
+          <Col xl={6} lg={12} sm={24} xs={24} style={{ marginBottom: 24}}>
+            <ChartCard
+              title="访问量"
+              style={{paddingTop: 40, paddingBottom: 40}}
+              action={
+                <Tooltip title="指标说明">
+                  <Icon type="info-circle-o" />
+                </Tooltip>
+              }
+              total={numeral(2846).format('0,0')}
+              footer={<Field label="日访问量" value={numeral(142).format('0,0')} />}
+              contentHeight={46}
             >
-              <WaterWave
-                height={161}
-                title={
-                  <FormattedMessage id="app.monitor.fund-surplus" defaultMessage="Fund Surplus" />
-                }
-                percent={34}
-              />
-            </Card>
+              <MiniBar height={46} data={visitData} />
+            </ChartCard>
           </Col>
         </Row>
         <Row gutter={24}>
           <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.activity-forecast"
-                  defaultMessage="Activity forecast"
-                />
-              }
-              style={{ marginBottom: 24 }}
-              bordered={false}
-            >
-              <ActiveChart />
-            </Card>
-            <Card
-              title={<FormattedMessage id="app.monitor.efficiency" defaultMessage="Efficiency" />}
+              title='职位分类'
               style={{ marginBottom: 24 }}
               bodyStyle={{ textAlign: 'center' }}
               bordered={false}
             >
-              <Gauge
-                title={formatMessage({ id: 'app.monitor.ratio', defaultMessage: 'Ratio' })}
+              <Pie
+                total={() => (
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: salesPieData.reduce((pre, now) => now.y + pre, 0),
+                    }}
+                  />
+                )}
+                data={salesPieData}
+                valueFormat={val => <span dangerouslySetInnerHTML={{ __html: val }} />}
                 height={180}
-                percent={87}
               />
+            </Card>
+            <Card
+              title="爬虫运行状态"
+              style={{ marginBottom: 24 }}
+              bordered={false}
+            >
+              <ActiveChart />
             </Card>
           </Col>
           <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>

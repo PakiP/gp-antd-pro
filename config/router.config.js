@@ -23,11 +23,11 @@ export default [
     Routes: ['src/pages/Authorized'],
     routes: [
       // dashboard
-      { path: '/', redirect: '/list/main-list', authority: ['admin', 'user'] },
+      { path: '/', redirect: '/dashboard/monitor', authority: ['admin', 'user'] },
       {
         path: '/dashboard',
         name: '数据统计',
-        icon: 'dashboard',
+        icon: 'area-chart',
         routes: [
           {
             path: '/dashboard/monitor',
@@ -43,14 +43,14 @@ export default [
         name: '数据列表',
         routes: [
           {
-            path: '/list/main-list',
+            path: '/list/job',
             name: '职位列表',
             component: './List/TableList',
           },
           {
-            path: '/list/automaker',
-            name: '控制台',
-            component: './List/AutoMaker',
+            path: '/list/user',
+            name: '用户列表',
+            component: './List/UserList',
           },
           // {
           //   path: '/list/basic-list',
@@ -88,6 +88,18 @@ export default [
           //     },
           //   ],
           // },
+        ],
+      },
+      {
+        path: '/automaker',
+        icon: 'setting',
+        name: '控制中心',
+        routes: [
+          {
+            path: '/automaker/index',
+            name: '控制台',
+            component: './List/AutoMaker',
+          }
         ],
       },
       {
