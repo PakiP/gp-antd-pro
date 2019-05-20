@@ -118,7 +118,7 @@ class TableList extends PureComponent {
       const {data} = logListArr;
       const listArr = [];
       data.forEach((curr) => {
-        listArr.push(<Timeline.Item>{curr.msg} {moment(+curr.time).format('YYYY-MM-DD HH:mm:ss')}</Timeline.Item>);
+        listArr.push(<Timeline.Item color={curr.status === 0 ? 'red' : 'green'}>{curr.msg} {moment(+curr.time).format('YYYY-MM-DD HH:mm:ss')}</Timeline.Item>);
       })
       return (
         <Timeline>
@@ -144,7 +144,9 @@ class TableList extends PureComponent {
       })
       const options = [];
       arr.forEach((curr, index, arr) => {
-        options.push(<Option value={curr}>{curr}</Option>)
+        if (index < 100) {
+          options.push(<Option value={curr}>{curr}</Option>)
+        }
       })
       return options;
     }

@@ -52,6 +52,26 @@ export async function pageUserList(params) {
   });
 }
 
+export async function pageUserCollectionListById(params) {
+  return request('/api/manage/pageUserCollectionListById', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function pageUserHistoryListById(params) {
+  return request('/api/manage/pageUserHistoryListById', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
 export async function changeJobStatus(params) {
   return request('/api/manage/changeJobStatus', {
     method: 'POST',
@@ -215,4 +235,46 @@ export async function getMenuList() {
   return request(`/api/crawler/getMenuList`);
 }
 
+export async function getJobDetail(params = {}) {
+  return request(`/api/manage/getJobDetail?${stringify(params)}`);
+}
 
+export async function pageAdminList(params) {
+  return request('/api/manage/pageAdminList', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function addNewAdmin(params) {
+  return request('/api/manage/addNewAdmin', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function changeAdminPsw(params) {
+  return request('/api/manage/changeAdminPsw', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function changeAdminStatus(params = {}) {
+  return request('/api/manage/changeAdminStatus', {
+    method: 'POST',
+    data: {
+      ...params,
+      method: 'post',
+    },
+  });
+}

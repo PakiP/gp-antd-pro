@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import router from 'umi/router';
+import Link from 'umi/link';
 import {
   Row,
   Col,
@@ -102,10 +103,10 @@ class TableList extends PureComponent {
     //   title: '学历',
     //   dataIndex: 'education',
     // },
-    // {
-    //   title: '公司',
-    //   dataIndex: 'companyName',
-    // },
+    {
+      title: '公司',
+      dataIndex: 'companyName',
+    },
     // {
     //   title: '融资',
     //   dataIndex: 'financeStage',
@@ -155,7 +156,8 @@ class TableList extends PureComponent {
       title: '操作',
       render: (text, record) => (
         <span>
-          <a href="javascript:;" onClick={() => this.showModal(record)}>查看</a>
+          {/* <a href="javascript:;" onClick={() => this.showModal(record)}>查看</a> */}
+          <Link to={`/list/jobDetail?id=${record._id}`}>查看详情</Link>
           <Divider type="vertical" />
           <a href="javascript:;" onClick={() => this.handleDisabled(record._id, record.status)}>{record.status ? '禁用' : '启用'}</a>
           {record.isComplete ? '' : (

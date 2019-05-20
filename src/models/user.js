@@ -33,6 +33,7 @@ export default {
       };
     },
     saveCurrentUser(state, action) {
+      // console.log('currentUser', action.payload)
       return {
         ...state,
         currentUser: action.payload || {},

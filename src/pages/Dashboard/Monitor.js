@@ -31,16 +31,17 @@ class Monitor extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'monitor/fetchTags',
-    });
-    dispatch({
       type: 'monitor/getJobAndUserNum',
-    });
-    dispatch({
-      type: 'monitor/getCategoryGroup',
-    });
-    dispatch({
-      type: 'monitor/getCrawlerStatus',
+    }).then(() => {
+      dispatch({
+        type: 'monitor/fetchTags',
+      });
+      dispatch({
+        type: 'monitor/getCategoryGroup',
+      });
+      dispatch({
+        type: 'monitor/getCrawlerStatus',
+      });
     });
   }
 
@@ -49,8 +50,10 @@ class Monitor extends Component {
     const { tags, jobAndUserNum, categoryGroup, crawlerStatus } = monitor;
     let jobNum = 0;
     let userNum = 0;
+    let requsetNum = 0;
     jobNum = jobAndUserNum && jobAndUserNum.totalJob;
-    userNum = categoryGroup && jobAndUserNum.totalUser;
+    userNum = jobAndUserNum && jobAndUserNum.totalUser;
+    requsetNum = jobAndUserNum && jobAndUserNum.totalRequset;
     let top1 = {name:' ', value: 0};
     let top2 = {name:' ', value: 0};
     let top3 = {name:' ', value: 0};
@@ -145,7 +148,7 @@ class Monitor extends Component {
                 <img
                   alt="indicator"
                   style={{ width: 56, height: 56 }}
-                  src="https://gw.alipayobjects.com/zos/rmsportal/dURIMkkrRFpPgTuzkwnB.png"
+                  src={require("@/assets/jobs.png")}
                 />
               }
               contentHeight={146}
@@ -163,7 +166,7 @@ class Monitor extends Component {
                 <img
                   alt="indicator"
                   style={{ width: 56, height: 56 }}
-                  src="https://gw.alipayobjects.com/zos/rmsportal/dURIMkkrRFpPgTuzkwnB.png"
+                  src={require("@/assets/users.png")}
                 />
               }
               action={
@@ -183,8 +186,8 @@ class Monitor extends Component {
                   <Icon type="info-circle-o" />
                 </Tooltip>
               }
-              total={numeral(2846).format('0,0')}
-              footer={<Field label="日访问量" value={numeral(142).format('0,0')} />}
+              total={numeral(requsetNum).format('0,0')}
+              // footer={<Field label="日访问量" value={numeral(142).format('0,0')} />}
               contentHeight={46}
             >
               <MiniBar height={46} data={visitData} />

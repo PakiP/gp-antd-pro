@@ -52,6 +52,24 @@ export default [
             name: '用户列表',
             component: './List/UserList',
           },
+          {
+            path: '/list/jobDetail',
+            name: '职位详情',
+            component: './Detail/JobDetail',
+            hideInMenu: true
+          },
+          {
+            path: '/list/userCollection',
+            name: '用户收藏列表',
+            component: './List/UserCollectionList',
+            hideInMenu: true
+          },
+          {
+            path: '/list/userHistory',
+            name: '用户收藏列表',
+            component: './List/UserHistoryList',
+            hideInMenu: true
+          },
           // {
           //   path: '/list/basic-list',
           //   name: '基础表单',
@@ -99,6 +117,11 @@ export default [
             path: '/automaker/index',
             name: '控制台',
             component: './List/AutoMaker',
+          },
+          {
+            path: '/automaker/admin',
+            name: '管理员列表',
+            component: './List/AdminList',
           }
         ],
       },

@@ -42,12 +42,12 @@ const rowSelection = {
 };
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ userList, loading }) => ({
-  userList,
+@connect(({ userCollectionList, loading }) => ({
+  userCollectionList,
   loading: loading.models.rule,
 }))
 @Form.create()
-class UserList extends PureComponent {
+class UserCollectionList extends PureComponent {
   state = {
     expandForm: false,
     selectedRows: [],
@@ -62,89 +62,59 @@ class UserList extends PureComponent {
   columns = [
     {
       title: 'ID',
-      dataIndex: 'openId',
+      dataIndex: 'jobs.positionId',
+      width: 10
     },
     {
-      title: '昵称',
-      dataIndex: 'nickName',
+      title: '职位',
+      dataIndex: 'jobs.name',
     },
     {
-      title: '省份',
-      dataIndex: 'province',
+      title: '薪资',
+      dataIndex: 'jobs.salary',
     },
     {
-      title: '城市',
-      dataIndex: 'city',
+      title: '公司',
+      dataIndex: 'jobs.companyName',
     },
     {
-      title: '性别',
-      dataIndex: 'gender',
-      render: (val) => val === 1 ? '男' : '女'
+      title: '状态',
+      dataIndex: 'status',
+      render: (status) => status === 1 ? '收藏中' : '已取消收藏',
     },
     {
-      title: '最后登录时间',
-      dataIndex: 'latesetTime',
+      title: '更新时间',
+      dataIndex: 'updateTime',
       render: (text) => moment(+text).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
-      title: '收藏中的职位数',
-      dataIndex: 'collection',
-      render: (val) => val,
-    },
-    {
-      title: '查看',
+      title: '操作',
       render: (text, record) => (
         <span>
-          <a href="javascript:;" onClick={this.showModal.bind(this, record)}>详情</a>
-          <Divider type="vertical" />
-          <Link to={`/list/userCollection?id=${record.openId}&name=${record.nickName}`}>全部收藏</Link>
-          <Divider type="vertical" />
-          <Link to={`/list/userHistory?id=${record.openId}&name=${record.nickName}`}>浏览记录</Link>
+          <Link to={`/list/jobDetail?id=${record.jobs._id}`}>查看详情</Link>
         </span>
       ),
     },
   ];
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'userList/pageUserList',
-      payload: {
-        pageNo: 1,
-        pageSize: 10,
-        query: {}
-      }
-    });
-  }
-
-  showModal = (record) => {
-    const { dispatch } = this.props;
+    const { dispatch, location } = this.props;
+    console.log(location.query);
     this.setState({
-      visible: true,
-      detail: record
-    });
-    // dispatch({
-    //   type: 'userList/getUserCollectionList',
-    //   payload: {
-    //     openId: record.openId
-    //   }
-    // });
-  };
-
-  handleDisabled = () => {
-    this.setState({ loading: true });
-    setTimeout(() => {
-      this.setState({ loading: false, visible: false });
-    }, 3000);
-  };
-
-  handleCancel = () => {
-    this.setState({ visible: false });
-  };
-
-  previewItem = id => {
-    router.push(`/profile/basic/${id}`);
-  };
+      currId: location.query.id,
+      currName: location.query.name
+    }, () => {
+      dispatch({
+        type: 'userCollectionList/pageUserCollectionListById',
+        payload: {
+          pageNo: 1,
+          pageSize: 10,
+          openId: this.state.currId,
+          query: {}
+        }
+      });
+    })
+  }
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
@@ -155,10 +125,11 @@ class UserList extends PureComponent {
       const params = {
         pageNo: this.state.pageNo,
         pageSize: this.state.pageSize,
+        openId: this.state.currId,
         query: this.state.formValues
       };
       dispatch({
-        type: 'userList/pageUserList',
+        type: 'userCollectionList/pageUserCollectionListById',
         payload: params,
       })
     });
@@ -218,10 +189,11 @@ class UserList extends PureComponent {
         const params = {
           pageNo: this.state.pageNo,
           pageSize: this.state.pageSize,
+          openId: this.state.currId,
           query: this.state.formValues
         };
         dispatch({
-          type: 'userList/pageUserList',
+          type: 'userCollectionList/pageUserCollectionListById',
           payload: params,
         })
       });
@@ -240,10 +212,11 @@ class UserList extends PureComponent {
     const params = {
       pageNo: current,
       pageSize: this.state.pageSize,
+      openId: this.state.currId,
       query: this.state.formValues
     };
     dispatch({
-      type: 'userList/pageUserList',
+      type: 'userCollectionList/pageUserCollectionListById',
       payload: params,
     })
   }
@@ -257,10 +230,11 @@ class UserList extends PureComponent {
     const params = {
       pageNo: this.state.pageNo,
       pageSize: pageSize,
+      openId: this.state.currId,
       query: this.state.formValues
     };
     dispatch({
-      type: 'userList/pageUserList',
+      type: 'userCollectionList/pageUserCollectionListById',
       payload: params,
     })
   }
@@ -353,9 +327,9 @@ class UserList extends PureComponent {
   }
 
   render() {
-    const { userList } = this.props;
-    const { data, collectionList } = userList;
-    const { visible, loading, detail } = this.state;
+    const { userCollectionList, history } = this.props;
+    const { data } = userCollectionList;
+    const { visible, loading, detail, currId, currName } = this.state;
     const paginationProps = {
       showSizeChanger: true,
       showQuickJumper: false,
@@ -416,32 +390,9 @@ class UserList extends PureComponent {
 
     return (
       <PageHeaderWrapper title="查询表格">
-        <Modal
-          visible={visible}
-          title="用户详情"
-          onCancel={this.handleCancel}
-          className={styles.modal}
-          footer={[
-            <Button key="back" onClick={this.handleCancel}>
-              返回
-            </Button>,
-            // <Button key="submit" type="danger" loading={loading} onClick={this.handleDisabled}>
-            //   禁用
-            // </Button>,
-          ]}
-        >
-          <Comment
-            avatar={
-              <Avatar
-                src={detail.avatarUrl}
-              />
-            }
-            content={detailDiv}
-          />
-        </Modal>
-        <Card bordered={false} title="用户列表">
+        <Card bordered={false} title={`${currName}的收藏列表(openId: ${currId})`} extra={<a href="javascript:;" onClick={() => history.goBack()}>返回</a>}>
           <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
+            {/* <div className={styles.tableListForm}>{this.renderForm()}</div> */}
             <Table columns={this.columns} dataSource={data.data} pagination={paginationProps} />
           </div>
         </Card>
@@ -450,4 +401,4 @@ class UserList extends PureComponent {
   }
 }
 
-export default UserList;
+export default UserCollectionList;
