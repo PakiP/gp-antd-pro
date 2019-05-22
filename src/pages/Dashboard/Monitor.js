@@ -187,7 +187,7 @@ class Monitor extends Component {
                 </Tooltip>
               }
               total={numeral(requsetNum).format('0,0')}
-              // footer={<Field label="日访问量" value={numeral(142).format('0,0')} />}
+              footer={<Field label="日访问量" value={numeral(142).format('0,0')} />}
               contentHeight={46}
             >
               <MiniBar height={46} data={visitData} />
@@ -232,7 +232,7 @@ class Monitor extends Component {
           </Col>
           <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
             <Card
-              title="热门标签统计"
+              title="职位标签统计"
               loading={loading}
               bordered={false}
               bodyStyle={{ overflow: 'hidden' }}
