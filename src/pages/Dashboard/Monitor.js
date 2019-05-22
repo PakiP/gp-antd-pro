@@ -51,9 +51,11 @@ class Monitor extends Component {
     let jobNum = 0;
     let userNum = 0;
     let requsetNum = 0;
+    let currDayrequsetNum = 0;
     jobNum = jobAndUserNum && jobAndUserNum.totalJob;
     userNum = jobAndUserNum && jobAndUserNum.totalUser;
     requsetNum = jobAndUserNum && jobAndUserNum.totalRequset;
+    currDayrequsetNum = jobAndUserNum && jobAndUserNum.currDayRequset;
     let top1 = {name:' ', value: 0};
     let top2 = {name:' ', value: 0};
     let top3 = {name:' ', value: 0};
@@ -67,7 +69,7 @@ class Monitor extends Component {
     // }
     const visitData = [];
     const beginDay = new Date().getTime();
-    for (let i = 0; i < 20; i += 1) {
+    for (let i = 0; i < 7; i += 1) {
       visitData.push({
         x: moment(new Date(beginDay + 1000 * 60 * 60 * 24 * i)).format('YYYY-MM-DD'),
         y: Math.floor(Math.random() * 100) + 10,
@@ -187,7 +189,7 @@ class Monitor extends Component {
                 </Tooltip>
               }
               total={numeral(requsetNum).format('0,0')}
-              footer={<Field label="日访问量" value={numeral(142).format('0,0')} />}
+              footer={<Field label="日访问量" value={currDayrequsetNum} />}
               contentHeight={46}
             >
               <MiniBar height={46} data={visitData} />
